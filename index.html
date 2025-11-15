@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Para Amanda ✨</title>
+  
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>✨ Para Amanda ✨</h1>
+      <p class="subtitle">Un espacio para recordar cosas importantes</p>
+    </header>
+
+    <!-- Main Cards -->
+    <main class="main-cards">
+      <!-- Barney Card -->
+      <div class="main-card barney-card" onclick="barneyManager.open()">
+        <h2>🎺 Barney y Amanda</h2>
+        <p>Frases especiales que vienen del corazón</p>
+      </div>
+
+      <!-- Memories Card -->
+      <div class="main-card memories-card" onclick="memoriesManager.open()">
+        <h2>📸 Los Recuerdos de Amanda</h2>
+        <p>Guarda y revive tus momentos más especiales</p>
+      </div>
+
+      <!-- Reminders Card -->
+      <div class="main-card reminders-card" onclick="remindersManager.open()">
+        <h2>📝 Recordatorios que no hay que olvidar</h2>
+        <p>Anota cosas que quieres recordarte en el futuro</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Barney Modal -->
+  <div id="barneyModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🎺 Barney y Amanda</h2>
+        <button class="close-btn" onclick="barneyManager.close()" aria-label="Cerrar">×</button>
+      </div>
+      <div class="content-div">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Memories Modal -->
+  <div id="memoriesModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📸 Los Recuerdos de Amanda</h2>
+        <button class="close-btn" onclick="memoriesManager.close()" aria-label="Cerrar">×</button>
+      </div>
+      <div class="content-div">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Reminders Modal -->
+  <div id="remindersModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📝 Recordatorios que no hay que olvidar</h2>
+        <button class="close-btn" onclick="remindersManager.close()" aria-label="Cerrar">×</button>
+      </div>
+      <div class="content-div">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Memory Page -->
+  <div id="sharedMemoryPage" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header memories">
+        <h2 class="modal-title">
+          <span>📸</span>
+          <span>Comparte un Recuerdo con Amanda</span>
+        </h2>
+      </div>
+      <div id="sharedMemoryContent">
+        <div class="loading">Cargando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/barney-phrases.js"></script>
+  <script src="js/memories.js"></script>
+  <script src="js/reminders.js"></script>
+
+  <!-- Initialization & Event Listeners -->
+  <script>
+    // Inicializar managers cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+      // Crear instancias globales
+      barneyManager = new BarneyPhrasesManager();
+      memoriesManager = new MemoriesManager();
+      remindersManager = new RemindersManager();
+
+      // Cerrar modals al hacer click fuera del contenido
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            const modalId = modal.id;
+            if (modalId === 'barneyModal') {
+              barneyManager.close();
+            } else if (modalId === 'memoriesModal') {
+              memoriesManager.close();
+            } else if (modalId === 'remindersModal') {
+              remindersManager.close();
+            }
+          }
+        });
+      });
+
+      // Cerrar modals con tecla ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          barneyManager.close();
+          memoriesManager.close();
+          remindersManager.close();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
