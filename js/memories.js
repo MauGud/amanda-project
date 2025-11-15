@@ -10,6 +10,7 @@ class MemoriesManager {
     this.currentView = 'grid'; // 'grid' | 'add' | 'edit' | 'detail'
     this.editingId = null;
     this.currentImageFile = null;
+    this.isSubmitting = false;
   }
 
   /**
@@ -285,29 +286,58 @@ class MemoriesManager {
    */
   async handleSubmit(event) {
     event.preventDefault();
+    event.stopPropagation();
+    
+    // Prevenir múltiples envíos simultáneos
+    if (this.isSubmitting) {
+      return;
+    }
+    
     if (!this.currentImageFile) {
       alert('Debes seleccionar una foto para el recuerdo');
       return;
     }
-    const title = document.getElementById('memoryTitle').value.trim();
-    const content = document.getElementById('memoryContent').value.trim();
-    const date = document.getElementById('memoryDate').value;
-    const compressedImage = await this.compressImage(this.currentImageFile);
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
-    const { data: uploadData, error: uploadError } = await window.db.client.storage.from('memory-photos').upload(fileName, compressedImage, { contentType: 'image/jpeg' });
-    if (uploadError) {
-      alert('Error al subir la imagen. Intenta de nuevo.');
-      console.error(uploadError);
-      return;
+    
+    // Marcar como en proceso de envío
+    this.isSubmitting = true;
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton ? submitButton.textContent : '';
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Guardando...';
     }
-    const { data: urlData } = window.db.client.storage.from('memory-photos').getPublicUrl(fileName);
-    const result = await window.db.createMemory({ title, content, date, image_url: urlData.publicUrl, image_path: fileName });
-    if (result.success) {
-      this.currentImageFile = null;
-      await this.loadMemories();
-      this.showSuccessMessage('¡Recuerdo guardado! ✨');
-    } else {
+    
+    try {
+      const title = document.getElementById('memoryTitle').value.trim();
+      const content = document.getElementById('memoryContent').value.trim();
+      const date = document.getElementById('memoryDate').value;
+      const compressedImage = await this.compressImage(this.currentImageFile);
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+      const { data: uploadData, error: uploadError } = await window.db.client.storage.from('memory-photos').upload(fileName, compressedImage, { contentType: 'image/jpeg' });
+      if (uploadError) {
+        alert('Error al subir la imagen. Intenta de nuevo.');
+        console.error(uploadError);
+        return;
+      }
+      const { data: urlData } = window.db.client.storage.from('memory-photos').getPublicUrl(fileName);
+      const result = await window.db.createMemory({ title, content, date, image_url: urlData.publicUrl, image_path: fileName });
+      if (result.success) {
+        this.currentImageFile = null;
+        await this.loadMemories();
+        this.showSuccessMessage('¡Recuerdo guardado! ✨');
+      } else {
+        alert('Error al guardar el recuerdo. Intenta de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error al guardar recuerdo:', error);
       alert('Error al guardar el recuerdo. Intenta de nuevo.');
+    } finally {
+      // Restaurar estado
+      this.isSubmitting = false;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
+      }
     }
   }
 
@@ -760,52 +790,82 @@ function handleSharedImageSelect(event) {
   sharedImageFile = file;
 }
 
+// Variable global para prevenir múltiples envíos del formulario compartido
+let isSharedFormSubmitting = false;
+
 async function handleSharedMemorySubmit(event) {
   event.preventDefault();
+  event.stopPropagation();
+  
+  // Prevenir múltiples envíos simultáneos
+  if (isSharedFormSubmitting) {
+    return;
+  }
   
   if (!sharedImageFile) {
     alert('Debes seleccionar una foto para el recuerdo');
     return;
   }
   
-  const name = document.getElementById('sharedName').value.trim();
-  const title = document.getElementById('sharedTitle').value.trim();
-  const content = document.getElementById('sharedContent').value.trim();
-  const date = document.getElementById('sharedDate').value;
-  
-  // Comprimir imagen
-  const compressedImage = await compressSharedImage(sharedImageFile);
-  
-  // Subir a Supabase
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
-  const { error: uploadError } = await window.db.client.storage
-    .from('memory-photos')
-    .upload(fileName, compressedImage, { contentType: 'image/jpeg' });
-  
-  if (uploadError) {
-    alert('Error al subir la imagen. Intenta de nuevo.');
-    return;
+  // Marcar como en proceso de envío
+  isSharedFormSubmitting = true;
+  const submitButton = event.target.querySelector('button[type="submit"]');
+  const originalButtonText = submitButton ? submitButton.textContent : '';
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Guardando...';
   }
   
-  const { data: urlData } = window.db.client.storage
-    .from('memory-photos')
-    .getPublicUrl(fileName);
-  
-  // Guardar recuerdo con el nombre de quien lo sube
-  const fullContent = `De: ${name}\n\n${content}`;
-  
-  const result = await window.db.createMemory({ 
-    title, 
-    content: fullContent, 
-    date,
-    image_url: urlData.publicUrl,
-    image_path: fileName
-  });
-  
-  if (result.success) {
-    showSuccessMessage();
-  } else {
+  try {
+    const name = document.getElementById('sharedName').value.trim();
+    const title = document.getElementById('sharedTitle').value.trim();
+    const content = document.getElementById('sharedContent').value.trim();
+    const date = document.getElementById('sharedDate').value;
+    
+    // Comprimir imagen
+    const compressedImage = await compressSharedImage(sharedImageFile);
+    
+    // Subir a Supabase
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+    const { error: uploadError } = await window.db.client.storage
+      .from('memory-photos')
+      .upload(fileName, compressedImage, { contentType: 'image/jpeg' });
+    
+    if (uploadError) {
+      alert('Error al subir la imagen. Intenta de nuevo.');
+      return;
+    }
+    
+    const { data: urlData } = window.db.client.storage
+      .from('memory-photos')
+      .getPublicUrl(fileName);
+    
+    // Guardar recuerdo con el nombre de quien lo sube
+    const fullContent = `De: ${name}\n\n${content}`;
+    
+    const result = await window.db.createMemory({ 
+      title, 
+      content: fullContent, 
+      date,
+      image_url: urlData.publicUrl,
+      image_path: fileName
+    });
+    
+    if (result.success) {
+      showSuccessMessage();
+    } else {
+      alert('Error al guardar el recuerdo. Intenta de nuevo.');
+    }
+  } catch (error) {
+    console.error('Error al guardar recuerdo compartido:', error);
     alert('Error al guardar el recuerdo. Intenta de nuevo.');
+  } finally {
+    // Restaurar estado
+    isSharedFormSubmitting = false;
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = originalButtonText;
+    }
   }
 }
 

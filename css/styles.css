@@ -1539,3 +1539,209 @@ body.modal-open {
     opacity: 0.9;
   }
 }
+
+/* ========== SHARED MEMORY PAGE - MOBILE OPTIMIZATION ========== */
+/* Estilos específicos para la página compartida en móvil */
+#sharedMemoryPage {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+#sharedMemoryPage.active {
+  display: flex;
+}
+
+#sharedMemoryPage .modal-content {
+  width: 100%;
+  max-width: 100vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+}
+
+#sharedMemoryPage .modal-header {
+  padding: 15px 20px;
+  margin-bottom: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 3px solid;
+  flex-shrink: 0;
+}
+
+#sharedMemoryPage .modal-header.memories {
+  border-bottom-color: var(--purple-primary);
+}
+
+#sharedMemoryPage .modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.3rem;
+  color: var(--bg-dark);
+  margin: 0;
+  width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#sharedMemoryPage .modal-title span {
+  flex-shrink: 0;
+}
+
+#sharedMemoryPage .modal-title span:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+#sharedMemoryContent {
+  padding: 20px 15px;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+#sharedMemoryContent .form-container {
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#sharedMemoryContent .form-group {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#sharedMemoryContent .form-group label {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#sharedMemoryContent .form-group input,
+#sharedMemoryContent .form-group textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font-size: 16px; /* Previene zoom en iOS */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#sharedMemoryContent .form-group textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  resize: vertical;
+  overflow-x: hidden;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+#sharedMemoryContent .form-group input[type="file"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 14px;
+}
+
+#sharedMemoryContent #sharedImagePreview {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 15px;
+}
+
+#sharedMemoryContent #sharedPreviewImg {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 10px;
+  box-sizing: border-box;
+  display: block;
+}
+
+#sharedMemoryContent .form-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100vw;
+  padding: 15px 20px;
+  padding-bottom: calc(15px + env(safe-area-inset-bottom));
+  background: var(--white);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+#sharedMemoryContent .form-actions .save-btn {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 15px 20px;
+  font-size: 1rem;
+}
+
+/* Media query para tablets y desktop - mantener estilos existentes */
+@media (min-width: 768px) {
+  #sharedMemoryPage .modal-content {
+    padding: 0;
+  }
+
+  #sharedMemoryPage .modal-header {
+    padding: 30px;
+  }
+
+  #sharedMemoryContent {
+    padding: 30px;
+    padding-bottom: 120px;
+  }
+
+  #sharedMemoryContent .form-container {
+    max-width: 700px;
+  }
+
+  #sharedMemoryContent .form-actions {
+    position: sticky;
+    bottom: 0;
+    padding: 20px 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  #sharedMemoryPage .modal-title {
+    font-size: 2rem;
+  }
+}
